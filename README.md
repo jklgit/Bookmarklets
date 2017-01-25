@@ -1,6 +1,6 @@
 # Bookmarklets
 
-Create a new bookmark and paste the given javascript-link. Online version always use the updated code from github. Offline versions work with [NoScript](https://addons.mozilla.org/en-US/firefox/addon/noscript/), since those work without adding `<script>`-elements to the site.
+Create a new bookmark and paste the given javascript-link. Online versions always use the updated code from github. Offline versions work with [NoScript](https://addons.mozilla.org/en-US/firefox/addon/noscript/), since those work without adding `<script>`-elements to the site.
 
 ## Copy Bookmarklet
 
