@@ -1,0 +1,1 @@
+ffmpeg -i output.webm -i palette.png -filter_complex "fps=25,scale=490:-1:flags=lanczos[x];[x][1:v]paletteuse" output.gif
