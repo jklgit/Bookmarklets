@@ -181,7 +181,7 @@
 						label.setAttribute('style', style);
 						divCheckboxes.appendChild(label);
 
-						style = 'all:initial';
+						style = 'all:initial;-webkit-appearance: checkbox;';
 						var input = document.createElement('input');
 						input.setAttribute('type', 'checkbox');
 						input.setAttribute('style', style);
@@ -222,7 +222,7 @@
 					label.setAttribute('style', style);
 					divCheckboxes.appendChild(label);
 
-					style = 'all:initial';
+					style = 'all:initial;-webkit-appearance: checkbox;';
 					var input = document.createElement('input');
 					input.setAttribute('type', 'checkbox');
 					input.setAttribute('style', style);
