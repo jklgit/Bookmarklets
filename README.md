@@ -8,8 +8,6 @@ Copy document title or post infos along with link to share with friends.
 
 ![copy example](https://raw.githubusercontent.com/jklgit/Bookmarklets/master/media/copy.gif)
 
-<div style="text-align:center"><img src ="https://raw.githubusercontent.com/jklgit/Bookmarklets/master/media/copy.gif" /></div>
-
 Online version:
 
 ```
