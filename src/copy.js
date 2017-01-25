@@ -18,9 +18,6 @@
 						settings : {
 							'Include watched users' : true,
 						}
-					}, {
-						name: 'Copy post info for Discord',
-						content: '```Markdown\n%characterline%%artistline%>%scoretag%%favstag%%commentstag%%favbytag%\n> %user% | %r% | %size%%is_animated%%has_audio% | %date%\n```<%link%>\n',
 					}
 				]
 			}, {
