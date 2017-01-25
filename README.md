@@ -6,6 +6,8 @@ Create a new bookmark and paste the given javascript-link. Online versions alway
 
 Copy document title or post infos along with link to share with friends.
 
+![copy example](https://raw.githubusercontent.com/jklgit/Bookmarklets/master/media/copy.gif)
+
 Online version:
 
 ```
