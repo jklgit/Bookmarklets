@@ -1,5 +1,6 @@
 // Special settings: These settings are in the bookmarklet itself. Uncomment for development.
 // var watchingSankakuUsers = [];
+// var discordStandard = false;
 
 (function () {
 
@@ -127,6 +128,7 @@
 		// Create div with all buttons and checkboxes and return them
 		var div;
 		var buttons = [];
+		var buttonsDiscord = [];
 		var buttonCheckboxes = [];
 		var checkboxes = {};
 		(function () {
@@ -158,6 +160,23 @@
 				button.setAttribute('my_id', i);
 				divButton.appendChild(button);
 				buttons.push(button); // Add button to global array
+				
+				// Append discordify button
+				style = 'all:initial;position:absolute;width:10%;height:100%;right:5%;background:#F0F0F0;border:solid 1px #222;color:#222;font-family:Arial;font-size:13px;text-align:center;';
+				var buttonDiscord = document.createElement('button');
+				buttonDiscord.setAttribute('style', style);
+				buttonDiscord.setAttribute('my_id', i);
+				try { // Compatibility if discordStandard not defined
+					if (discordStandard) {
+						buttonDiscord.innerHTML = 'As Text';
+					} else {
+						buttonDiscord.innerHTML = 'For Discord';
+					};
+				} catch (err) {
+					buttonDiscord.innerHTML = 'For Discord';
+				};
+				divButton.appendChild(buttonDiscord);
+				buttonsDiscord.push(buttonDiscord);
 
 				// Append checkboxes if settings are given
 				if (site.buttons[i].settings) {
@@ -259,7 +278,31 @@
 					event.preventDefault(); // Do not scroll to top
 
 					// Copy the text for button
-					copy(getText(event.target.getAttribute('my_id')));
+					var text = getText(event.target.getAttribute('my_id'));
+					try { // Compatibility if discordStandard not defined
+						if (discordStandard) {
+							text = discordify(text);
+						};
+					} catch (err) {};
+					copy(text);
+
+					// Remove all buttons after click
+					div.parentNode.removeChild(div);
+				});
+				
+				buttonsDiscord[i].addEventListener("click", function (event) {
+					event.preventDefault(); // Do not scroll to top
+
+					// Copy the text for button
+					var text = getText(event.target.getAttribute('my_id'));
+					try { // Compatibility if discordStandard not defined
+						if (!discordStandard) {
+							text = discordify(text);
+						};
+					} catch (err) {
+						text = discordify(text);
+					};
+					copy(text);
 
 					// Remove all buttons after click
 					div.parentNode.removeChild(div);
@@ -274,6 +317,60 @@
 				};
 				o = getDefaultObject(o);
 				return parseText(site.buttons[i].content, o);
+			};
+			
+			// Prepare text for discord
+			function discordify(text){
+				// Replace all links
+				var lines = text.split('\n');
+				text = '';
+				for (var i = 0; i < lines.length; i++) {
+					// Replace all lines with links with <link>
+					if (lines[i].startsWith('http')) {
+						text += '<' + lines[i] + '>\n';
+					} else {
+						text += lines[i] + '\n';
+					}
+				};
+			
+				// Replace block quotes
+				text = text.split('`\n').join('`');
+				text = text.split('`').join('```');
+			
+				// Check every line for > quotes
+				var dtext = '';
+				lines = text.split('\n');
+				var b_quote = false;
+				for(var i = 0; i < lines.length; i++){
+					if(lines[i].startsWith('>')){ // If line is a quote
+						if(b_quote){ // Already quoting?
+							// Then add the line with the > removed
+							dtext = dtext + '\n' + lines[i].substr(1).trim();
+						}
+						else{
+							// If not quoting, start the quote
+							b_quote = true;
+							dtext = dtext + '```' + lines[i].substr(1).trim();
+						}
+					}
+					else {
+						if(b_quote){ // Was quoting
+							// Then stop the quote
+							b_quote = false;
+							dtext = dtext + '```' + lines[i];
+						}
+						else{
+							dtext = dtext + '\n' + lines[i]; // Add next line normally
+						}
+					}
+				}
+				
+				if(b_quote){ // Quote didn't end
+					// Then stop the quote
+					dtext = dtext + '```';
+				};
+				
+				return dtext.trim() + '\n';
 			};
 
 			// Return settings object for checkboxes
