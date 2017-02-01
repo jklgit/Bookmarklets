@@ -350,7 +350,7 @@
 						else{
 							// If not quoting, start the quote
 							b_quote = true;
-							dtext = dtext + '```' + lines[i].substr(1).trim();
+							dtext = dtext + '```\n' + lines[i].substr(1).trim();
 						}
 					}
 					else {
