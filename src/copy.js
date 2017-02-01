@@ -1,6 +1,6 @@
 // Special settings: These settings are in the bookmarklet itself. Uncomment for development.
-// var watchingSankakuUsers = [];
-// var discordStandard = false;
+var watchingSankakuUsers = [];
+var discordStandard = false;
 
 (function () {
 
@@ -14,11 +14,14 @@
 						name: 'Copy link',
 						content: '%link%'
 					}, {
-						name: 'Copy post info',
+						name: 'Copy post info + watched users',
 						content: '%characterline%%artistline%>%scoretag%%favstag%%commentstag%%favbytag%\n> %user% | %r% | %size%%is_animated%%has_audio% | %date%\n%link%\n',
-						settings : {
-							'Include watched users' : true,
-						}
+						condition: function () {
+							return (watchingSankakuUsers.length > 0);
+						},
+					}, {
+						name: 'Copy post info',
+						content: '%characterline%%artistline%>%scoretag%%favstag%%commentstag%\n> %user% | %r% | %size%%is_animated%%has_audio% | %date%\n%link%\n',
 					}
 				]
 			}, {
@@ -141,81 +144,90 @@
 			// Add buttons
 			for (var i = 0; i < site.buttons.length; i++) {
 
-				// Div for every button, where button and local settings with checkboxes are in
-				style = 'display:block;width:100%;height:50px;position:relative';
-				var divButton = document.createElement('div');
-				divButton.setAttribute('style', style);
-				div.appendChild(divButton);
-
-				// Append button
-				style = 'all:initial;position:relative;width:100%;height:100%;background:#F0F0F0;border:solid 1px #222;color:#222;font-family:Arial;font-size:13px;';
-				var button = document.createElement('button');
-				if (!site.buttons[i].settings) {
-					button.setAttribute('style', style + 'text-align:center;');
-					button.innerHTML = site.buttons[i].name;
-				} else {
-					button.setAttribute('style', style);
-					button.innerHTML = '<span style="all:initial;position:absolute;top:5px;color:#222;font-family:Arial;font-size:13px;text-align:center;width:100%;margin:0 auto;">' + site.buttons[i].name + '</span>';
+				var b_createButton = true;
+				if (site.buttons[i].condition) { // If condition for button is defined
+					b_createButton = site.buttons[i].condition();
 				};
-				button.setAttribute('my_id', i);
-				divButton.appendChild(button);
-				buttons.push(button); // Add button to global array
-				
-				// Append discordify button
-				style = 'all:initial;position:absolute;width:10%;height:100%;right:5%;background:#F0F0F0;border:solid 1px #222;color:#222;font-family:Arial;font-size:13px;text-align:center;';
-				var buttonDiscord = document.createElement('button');
-				buttonDiscord.setAttribute('style', style);
-				buttonDiscord.setAttribute('my_id', i);
-				try { // Compatibility if discordStandard not defined
-					if (discordStandard) {
-						buttonDiscord.innerHTML = 'As Text';
+
+				if (b_createButton) {
+
+					// Div for every button, where button and local settings with checkboxes are in
+					style = 'display:block;width:100%;height:50px;position:relative';
+					var divButton = document.createElement('div');
+					divButton.setAttribute('style', style);
+					div.appendChild(divButton);
+
+					// Append button
+					style = 'all:initial;position:relative;width:100%;height:100%;background:#F0F0F0;border:solid 1px #222;color:#222;font-family:Arial;font-size:13px;';
+					var button = document.createElement('button');
+					if (!site.buttons[i].settings) {
+						button.setAttribute('style', style + 'text-align:center;');
+						button.innerHTML = site.buttons[i].name;
 					} else {
+						button.setAttribute('style', style);
+						button.innerHTML = '<span style="all:initial;position:absolute;top:5px;color:#222;font-family:Arial;font-size:13px;text-align:center;width:100%;margin:0 auto;">' + site.buttons[i].name + '</span>';
+					};
+					button.setAttribute('my_id', i);
+					divButton.appendChild(button);
+					buttons.push(button); // Add button to global array
+
+					// Append discordify button
+					style = 'all:initial;position:absolute;width:10%;height:100%;right:5%;background:#F0F0F0;border:solid 1px #222;color:#222;font-family:Arial;font-size:13px;text-align:center;';
+					var buttonDiscord = document.createElement('button');
+					buttonDiscord.setAttribute('style', style);
+					buttonDiscord.setAttribute('my_id', i);
+					try { // Compatibility if discordStandard not defined
+						if (discordStandard) {
+							buttonDiscord.innerHTML = 'As Text';
+						} else {
+							buttonDiscord.innerHTML = 'For Discord';
+						};
+					} catch (err) {
 						buttonDiscord.innerHTML = 'For Discord';
 					};
-				} catch (err) {
-					buttonDiscord.innerHTML = 'For Discord';
-				};
-				divButton.appendChild(buttonDiscord);
-				buttonsDiscord.push(buttonDiscord);
+					divButton.appendChild(buttonDiscord);
+					buttonsDiscord.push(buttonDiscord);
 
-				// Append checkboxes if settings are given
-				if (site.buttons[i].settings) {
+					// Append checkboxes if settings are given
+					if (site.buttons[i].settings) {
 
-					style = 'position:absolute;bottom:0px;width:100%;pointer-events:none';
-					var divCheckboxesWrapper = document.createElement('div');
-					divCheckboxesWrapper.setAttribute('style', style);
-					divButton.appendChild(divCheckboxesWrapper);
+						style = 'position:absolute;bottom:0px;width:100%;pointer-events:none';
+						var divCheckboxesWrapper = document.createElement('div');
+						divCheckboxesWrapper.setAttribute('style', style);
+						divButton.appendChild(divCheckboxesWrapper);
 
-					style = 'text-align:center;margin: 2px;';
-					var divCheckboxes = document.createElement('div');
-					divCheckboxes.setAttribute('style', style);
-					divCheckboxesWrapper.appendChild(divCheckboxes);
+						style = 'text-align:center;margin: 2px;';
+						var divCheckboxes = document.createElement('div');
+						divCheckboxes.setAttribute('style', style);
+						divCheckboxesWrapper.appendChild(divCheckboxes);
 
-					var checkboxArray = {};
-					for (var key in site.buttons[i].settings) {
-						value = site.buttons[i].settings[key];
+						var checkboxArray = {};
+						for (var key in site.buttons[i].settings) {
+							value = site.buttons[i].settings[key];
 
-						style = 'all:initial;color:#222;font-family:Arial;font-size:13px;margin:0 10px';
-						var label = document.createElement('label');
-						label.setAttribute('style', style);
-						divCheckboxes.appendChild(label);
+							style = 'all:initial;color:#222;font-family:Arial;font-size:13px;margin:0 10px';
+							var label = document.createElement('label');
+							label.setAttribute('style', style);
+							divCheckboxes.appendChild(label);
 
-						style = 'all:initial;-webkit-appearance: checkbox;';
-						var input = document.createElement('input');
-						input.setAttribute('type', 'checkbox');
-						input.setAttribute('style', style);
-						if (value === true) {
-							input.setAttribute('checked', '');
+							style = 'all:initial;-webkit-appearance: checkbox;';
+							var input = document.createElement('input');
+							input.setAttribute('type', 'checkbox');
+							input.setAttribute('style', style);
+							if (value === true) {
+								input.setAttribute('checked', '');
+							};
+							label.appendChild(input);
+							checkboxArray[key] = input;
+
+							var text = document.createTextNode(key);
+							label.appendChild(text);
 						};
-						label.appendChild(input);
-						checkboxArray[key] = input;
-
-						var text = document.createTextNode(key);
-						label.appendChild(text);
+						buttonCheckboxes.push(checkboxArray);
+					} else {
+						buttonCheckboxes.push({});
 					};
-					buttonCheckboxes.push(checkboxArray);
-				} else {
-					buttonCheckboxes.push({});
+
 				};
 			};
 
@@ -289,7 +301,7 @@
 					// Remove all buttons after click
 					div.parentNode.removeChild(div);
 				});
-				
+
 				buttonsDiscord[i].addEventListener("click", function (event) {
 					event.preventDefault(); // Do not scroll to top
 
@@ -318,9 +330,9 @@
 				o = getDefaultObject(o);
 				return parseText(site.buttons[i].content, o);
 			};
-			
+
 			// Prepare text for discord
-			function discordify(text){
+			function discordify(text) {
 				// Replace all links
 				var lines = text.split('\n');
 				text = '';
@@ -332,44 +344,41 @@
 						text += lines[i] + '\n';
 					}
 				};
-			
+
 				// Replace block quotes
 				text = text.split('`\n').join('`');
 				text = text.split('`').join('```');
-			
+
 				// Check every line for > quotes
 				var dtext = '';
 				lines = text.split('\n');
 				var b_quote = false;
-				for(var i = 0; i < lines.length; i++){
-					if(lines[i].startsWith('>')){ // If line is a quote
-						if(b_quote){ // Already quoting?
+				for (var i = 0; i < lines.length; i++) {
+					if (lines[i].startsWith('>')) { // If line is a quote
+						if (b_quote) { // Already quoting?
 							// Then add the line with the > removed
 							dtext = dtext + '\n' + lines[i].substr(1).trim();
-						}
-						else{
+						} else {
 							// If not quoting, start the quote
 							b_quote = true;
 							dtext = dtext + '```\n' + lines[i].substr(1).trim();
 						}
-					}
-					else {
-						if(b_quote){ // Was quoting
+					} else {
+						if (b_quote) { // Was quoting
 							// Then stop the quote
 							b_quote = false;
 							dtext = dtext + '```' + lines[i];
-						}
-						else{
+						} else {
 							dtext = dtext + '\n' + lines[i]; // Add next line normally
 						}
 					}
 				}
-				
-				if(b_quote){ // Quote didn't end
+
+				if (b_quote) { // Quote didn't end
 					// Then stop the quote
 					dtext = dtext + '```';
 				};
-				
+
 				return dtext.trim() + '\n';
 			};
 
@@ -441,22 +450,20 @@
 
 		})();
 	};
-	
-	function nodify(nodes){
-		if(Object.prototype.toString.call( nodes ) === '[object HTMLCollection]'){
-			if(nodes.length === 0){
+
+	function nodify(nodes) {
+		if (Object.prototype.toString.call(nodes) === '[object HTMLCollection]') {
+			if (nodes.length === 0) {
 				var element = document.createElement('div');
 				element.innerHtml = 'nullarray';
 				nodes = [];
 				nodes.push(element);
 			}
-		}
-		else if(nodes === null){
+		} else if (nodes === null) {
 			var element = document.createElement('div');
 			element.textContent = 'null';
 			nodes = element;
-		}
-		else if(nodes === undefined){
+		} else if (nodes === undefined) {
 			var element = document.createElement('div');
 			element.textContent = 'undefined';
 			nodes = element;
@@ -496,7 +503,7 @@
 			};
 			return charactertext;
 		};
-		
+
 		// Get copyright and character
 		var copyrightarray = getArrayFromTags(jQuery('.tag-type-copyright > a'));
 		var copyrighttext = getTextFromArray(copyrightarray);
@@ -532,16 +539,14 @@
 			favnr = favs.split(', ').length;
 		};
 		var favbytext = '';
-		if (settings['Include watched users']) {
-			var users = watchingSankakuUsers;
-			for (var i = 0; i < users.length; i++) {
-				if (favs.indexOf(users[i]) !== -1) {
-					favbytext = favbytext + ' ' + users[i];
-				}
-			};
-			if (favbytext !== '') {
-				favbytext = ' [' + favbytext + ' ]';
+		var users = watchingSankakuUsers;
+		for (var i = 0; i < users.length; i++) {
+			if (favs.indexOf(users[i]) !== -1) {
+				favbytext = favbytext + ' ' + users[i];
 			}
+		};
+		if (favbytext !== '') {
+			favbytext = ' [' + favbytext + ' ]';
 		};
 
 		// Get comments
@@ -572,14 +577,14 @@
 				rating = litext['Rating: '.length].toLowerCase();
 			}
 		};
-		
+
 		// Find out if it is animated and has audio
 		var is_animated = '';
-		if(/animated/.exec(jQuery('.tag-type-medium > a').text())){
+		if (/animated/.exec(jQuery('.tag-type-medium > a').text())) {
 			is_animated = ' ' + decodeURI('%E2%9C%87');
 		};
 		var has_audio = '';
-		if(/has[\s_]audio/.exec(jQuery('.tag-type-medium > a').text())){
+		if (/has[\s_]audio/.exec(jQuery('.tag-type-medium > a').text())) {
 			has_audio = ' ' + decodeURI('%E2%99%AB');
 		};
 
@@ -735,11 +740,11 @@
 	function getAmazonObject(settings, globalSettings) {
 		// Icons
 		var star = decodeURI('%E2%98%86');
-		
+
 		var price = nodify(document.getElementById('priceblock_ourprice')).innerText.trim();
-		if (price === 'null'){
+		if (price === 'null') {
 			price = nodify(document.getElementById('priceblock_saleprice')).innerText.trim();
-			if (price === 'null'){
+			if (price === 'null') {
 				price = 'N/A';
 			}
 		};
@@ -747,7 +752,7 @@
 		var rating = nodify(document.getElementById('reviewStarsLinkedCustomerReviews')).innerText
 			.trim().split('von')[0].split('out')[0].trim();
 		var ratingtag = '';
-		if(rating !== 'null'){
+		if (rating !== 'null') {
 			ratingtag = '[ ' + star + ' ' + rating + ' from ' + nodify(document.getElementById('acrCustomerReviewText')).innerText.trim().split(' ')[0] + ' reviews ]';
 		};
 
