@@ -82,17 +82,14 @@ var discordStandard = false;
 					}
 				]
 			}, {
-				regexp: /^https:\/\/(www\.)?amazon\.(de|com|ca)\/.*\/.*\/.*$/,
-				object: getAmazonObject,
-				settings: {
-					'Clean link': true,
-				},
+				regexp: /^https:\/\/.{2,3}\.wikipedia\.org\/wiki\/.+$/,
+				object: getWikipediaObject,
 				buttons: [{
 						name: 'Copy link',
 						content: '%link%'
 					}, {
-						name: 'Copy title + link',
-						content: '> %title%\n%firstsentence%%link%\n',
+						name: 'Copy article + link',
+						content: '> %wikititle%\n%firstsentence%%link%\n',
 					}
 				]
 			}
@@ -769,5 +766,32 @@ var discordStandard = false;
 			'amazonlink': amazonlink,
 		};
 		return o;
+	};
+	
+	function getWikipediaObject(settings, globalSettings) {
+		var el;
+		
+		var wikititle = '';
+		el = document.getElementById('firstHeading');
+		if(el !== null){
+			wikititle = el.innerText;
+		}
+		else{
+			wikititle = document.title;
+		}
+		
+		var firstsentence = '';
+		el = document.querySelector('#mw-content-text > p');
+		if(el === null){ // if el not found
+			el = document.querySelector('#bodyContent p');
+		};
+		if(el){
+			firstsentence = '> ' + el.innerText.split('. ')[0] + '\n';
+		};
+				
+		return {
+			'wikititle' : wikititle,
+			'firstsentence': firstsentence,
+		};
 	};
 })();
