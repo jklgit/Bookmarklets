@@ -364,7 +364,7 @@ var discordStandard = false;
 						if (b_quote) { // Was quoting
 							// Then stop the quote
 							b_quote = false;
-							dtext = dtext + '```' + lines[i];
+							dtext = dtext + '``` ' + lines[i];
 						} else {
 							dtext = dtext + '\n' + lines[i]; // Add next line normally
 						}
@@ -786,7 +786,7 @@ var discordStandard = false;
 			el = document.querySelector('#bodyContent p');
 		};
 		if(el){
-			firstsentence = '> ' + el.innerText.split('. ')[0] + '\n';
+			firstsentence = '> ' + el.innerText.split('. ')[0] + '.\n';
 		};
 				
 		return {
