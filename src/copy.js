@@ -364,7 +364,7 @@ var discordStandard = false;
 						if (b_quote) { // Was quoting
 							// Then stop the quote
 							b_quote = false;
-							dtext = dtext + '``` ' + lines[i];
+							dtext = dtext + '```' + lines[i];
 						} else {
 							dtext = dtext + '\n' + lines[i]; // Add next line normally
 						}
@@ -746,7 +746,7 @@ var discordStandard = false;
 			}
 		};
 
-		var rating = nodify(document.getElementById('reviewStarsLinkedCustomerReviews')).innerText
+		var rating = nodify(document.querySelector('#centerCol .a-icon-alt')).innerText
 			.trim().split('von')[0].split('out')[0].trim();
 		var ratingtag = '';
 		if (rating !== 'null') {
