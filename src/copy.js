@@ -171,7 +171,7 @@ var copyBookmarkletSettings = {
 					buttons.push(button); // Add button to global array
 
 					// Append discordify button
-					style = 'all:initial;position:absolute;width:10%;height:100%;right:5%;background:#F0F0F0;border:solid 1px #222;color:#222;font-family:Arial;font-size:13px;text-align:center;';
+					style = 'all:initial;position:absolute;width:20%;height:100%;right:5%;background:#F0F0F0;border:solid 1px #222;color:#222;font-family:Arial;font-size:13px;text-align:center;top:0px';
 					var buttonDiscord = document.createElement('button');
 					buttonDiscord.setAttribute('style', style);
 					buttonDiscord.setAttribute('my_id', i);
