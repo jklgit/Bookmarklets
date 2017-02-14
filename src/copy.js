@@ -1,6 +1,8 @@
-// Special settings: These settings are in the bookmarklet itself. Uncomment for development.
-var watchingSankakuUsers = [];
-var discordStandard = false;
+// Global Settings for the copy bookmarklet
+var copyBookmarkletSettings = {
+	discordStandard : false,
+	watchingSankakuUsers : [],
+};
 
 (function () {
 
@@ -17,7 +19,7 @@ var discordStandard = false;
 						name: 'Copy post info + watched users',
 						content: '%characterline%%artistline%>%scoretag%%favstag%%commentstag%%favbytag%\n> %user% | %r% | %size%%is_animated%%has_audio% | %date%\n%link%%previewlink%\n',
 						condition: function () {
-							return (watchingSankakuUsers.length > 0);
+							return (copyBookmarkletSettings.watchingSankakuUsers.length > 0);
 						},
 					}, {
 						name: 'Copy post info',
@@ -173,13 +175,9 @@ var discordStandard = false;
 					var buttonDiscord = document.createElement('button');
 					buttonDiscord.setAttribute('style', style);
 					buttonDiscord.setAttribute('my_id', i);
-					try { // Compatibility if discordStandard not defined
-						if (discordStandard) {
-							buttonDiscord.innerHTML = 'As Text';
-						} else {
-							buttonDiscord.innerHTML = 'For Discord';
-						};
-					} catch (err) {
+					if (copyBookmarkletSettings.discordStandard) {
+						buttonDiscord.innerHTML = 'As Text';
+					} else {
 						buttonDiscord.innerHTML = 'For Discord';
 					};
 					divButton.appendChild(buttonDiscord);
@@ -287,17 +285,15 @@ var discordStandard = false;
 					event.preventDefault(); // Do not scroll to top
 					
 					var isDiscord = false;
-					if(discordStandard){
+					if(copyBookmarkletSettings.discordStandard){
 						isDiscord = true;
 					};
 					
 					// Copy the text for button
 					var text = getText(event.target.getAttribute('my_id'), isDiscord);
-					try { // Compatibility if discordStandard not defined
-						if (discordStandard) {
-							text = discordify(text);
-						};
-					} catch (err) {};
+					if (copyBookmarkletSettings.discordStandard) {
+						text = discordify(text);
+					};
 					copy(text);
 
 					// Remove all buttons after click
@@ -308,17 +304,13 @@ var discordStandard = false;
 					event.preventDefault(); // Do not scroll to top
 					
 					var isDiscord = true;
-					if(discordStandard){
+					if(copyBookmarkletSettings.discordStandard){
 						isDiscord = false;
 					};
 					
 					// Copy the text for button
 					var text = getText(event.target.getAttribute('my_id'), isDiscord);
-					try { // Compatibility if discordStandard not defined
-						if (!discordStandard) {
-							text = discordify(text);
-						};
-					} catch (err) {
+					if (!copyBookmarkletSettings.discordStandard) {
 						text = discordify(text);
 					};
 					copy(text);
@@ -539,7 +531,7 @@ var discordStandard = false;
 			favnr = favs.split(', ').length;
 		};
 		var favbytext = '';
-		var users = watchingSankakuUsers;
+		var users = copyBookmarkletSettings.watchingSankakuUsers;
 		for (var i = 0; i < users.length; i++) {
 			if (favs.indexOf(users[i]) !== -1) {
 				favbytext = favbytext + ' ' + users[i];
