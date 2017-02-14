@@ -10,9 +10,9 @@ Does not work on Github and Twitter ([see here](https://medium.com/making-instap
 
 Copy document title or post infos along with link to share with friends.
 
-![copy example](https://raw.githubusercontent.com/jklgit/Bookmarklets/master/media/copy.gif)
-
 [Javascript link](https://raw.githubusercontent.com/jklgit/Bookmarklets/master/src/copy_offline.js)
+
+![copy example](https://raw.githubusercontent.com/jklgit/Bookmarklets/master/media/copy.gif)
 
 ## Video Finder
 
