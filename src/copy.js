@@ -15,13 +15,13 @@ var discordStandard = false;
 						content: '%link%'
 					}, {
 						name: 'Copy post info + watched users',
-						content: '%characterline%%artistline%>%scoretag%%favstag%%commentstag%%favbytag%\n> %user% | %r% | %size%%is_animated%%has_audio% | %date%\n%link%\n',
+						content: '%characterline%%artistline%>%scoretag%%favstag%%commentstag%%favbytag%\n> %user% | %r% | %size%%is_animated%%has_audio% | %date%\n%link%%previewlink%\n',
 						condition: function () {
 							return (watchingSankakuUsers.length > 0);
 						},
 					}, {
 						name: 'Copy post info',
-						content: '%characterline%%artistline%>%scoretag%%favstag%%commentstag%\n> %user% | %r% | %size%%is_animated%%has_audio% | %date%\n%link%\n',
+						content: '%characterline%%artistline%>%scoretag%%favstag%%commentstag%\n> %user% | %r% | %size%%is_animated%%has_audio% | %date%\n%link%%previewlink%\n',
 					}
 				]
 			}, {
@@ -285,9 +285,14 @@ var discordStandard = false;
 			for (var i = 0; i < buttons.length; i++) {
 				buttons[i].addEventListener("click", function (event) {
 					event.preventDefault(); // Do not scroll to top
-
+					
+					var isDiscord = false;
+					if(discordStandard){
+						isDiscord = true;
+					};
+					
 					// Copy the text for button
-					var text = getText(event.target.getAttribute('my_id'));
+					var text = getText(event.target.getAttribute('my_id'), isDiscord);
 					try { // Compatibility if discordStandard not defined
 						if (discordStandard) {
 							text = discordify(text);
@@ -301,9 +306,14 @@ var discordStandard = false;
 
 				buttonsDiscord[i].addEventListener("click", function (event) {
 					event.preventDefault(); // Do not scroll to top
-
+					
+					var isDiscord = true;
+					if(discordStandard){
+						isDiscord = false;
+					};
+					
 					// Copy the text for button
-					var text = getText(event.target.getAttribute('my_id'));
+					var text = getText(event.target.getAttribute('my_id'), isDiscord);
 					try { // Compatibility if discordStandard not defined
 						if (!discordStandard) {
 							text = discordify(text);
@@ -319,29 +329,18 @@ var discordStandard = false;
 			};
 
 			// Return text to copy
-			function getText(i) {
+			function getText(i, isDiscord) {
 				var o = {};
 				if (site.object) { // If object is given, evaluate object
-					o = site.object(getSettingsObject(buttonCheckboxes[i]), getSettingsObject(checkboxes));
+					o = site.object(getSettingsObject(buttonCheckboxes[i]), getSettingsObject(checkboxes), isDiscord);
 				};
-				o = getDefaultObject(o);
+				o = getDefaultObject(o, isDiscord);
 				return parseText(site.buttons[i].content, o);
 			};
 
 			// Prepare text for discord
 			function discordify(text) {
-				// Replace all links
-				var lines = text.split('\n');
-				text = '';
-				for (var i = 0; i < lines.length; i++) {
-					// Replace all lines with links with <link>
-					if (lines[i].startsWith('http')) {
-						text += '<' + lines[i] + '>\n';
-					} else {
-						text += lines[i] + '\n';
-					}
-				};
-
+				
 				// Replace block quotes
 				text = text.split('`\n').join('`');
 				text = text.split('`').join('```');
@@ -430,13 +429,17 @@ var discordStandard = false;
 			};
 
 			// Add default elements
-			function getDefaultObject(o) {
+			function getDefaultObject(o, isDiscord) {
 				var title = document.title.trim();
 				if (title.length > 200) {
 					title = title.substr(0, 197) + '...';
 				};
+				var link = document.location.href;
+				if (isDiscord){
+					link = '<' + link + '>';
+				};
 				var defaultObject = {
-					'link': document.location.href,
+					'link': link,
 					'title': title
 				};
 				for (var key in defaultObject) {
@@ -469,7 +472,7 @@ var discordStandard = false;
 	};
 
 	// Additional functions for sites
-	function getSankakucomplexObject(settings, globalSettings) {
+	function getSankakucomplexObject(settings, globalSettings, isDiscord) {
 
 		function getArrayFromTags(chars, copyrightArray) {
 			var array = [];
@@ -588,6 +591,15 @@ var discordStandard = false;
 		// Icons
 		var star = decodeURI('%E2%98%86');
 		var heart = decodeURI('%E2%99%A1');
+		
+		// If Discord, add preview
+		var previewlink = '';
+		if(isDiscord){
+			var src = jQuery('#image').attr('src');
+			if(src){
+				previewlink = ' https:' + src;
+			};
+		};
 
 		return {
 			'characterline': characterline,
@@ -602,10 +614,11 @@ var discordStandard = false;
 			'commentstag': commentstag,
 			'has_audio': has_audio,
 			'is_animated': is_animated,
+			'previewlink': previewlink,
 		};
 	};
 
-	function getYoutubeObject(settings, globalSettings) {
+	function getYoutubeObject(settings, globalSettings, isDiscord) {
 		// Parse info
 		var title = document.getElementById('eow-title').innerText;
 		var uploader = document.getElementsByClassName('yt-user-info')[0].innerText;
@@ -673,7 +686,7 @@ var discordStandard = false;
 		};
 	};
 
-	function getImdbObject(settings, globalSettings) {
+	function getImdbObject(settings, globalSettings, isDiscord) {
 		// Icons
 		var star = decodeURI('%E2%98%86');
 
@@ -706,7 +719,7 @@ var discordStandard = false;
 		return o
 	};
 
-	function getMyanimelistObject(settings, globalSettings) {
+	function getMyanimelistObject(settings, globalSettings, isDiscord) {
 		// Icons
 		var star = decodeURI('%E2%98%86');
 
@@ -734,7 +747,7 @@ var discordStandard = false;
 		return o;
 	};
 
-	function getAmazonObject(settings, globalSettings) {
+	function getAmazonObject(settings, globalSettings, isDiscord) {
 		// Icons
 		var star = decodeURI('%E2%98%86');
 
@@ -757,6 +770,9 @@ var discordStandard = false;
 		if (globalSettings['Clean link']) {
 			amazonlink = amazonlink.split('ref=')[0];
 		};
+		if(isDiscord){
+			amazonlink = '<' + amazonlink + '>';
+		};
 
 		var o = {
 			'productname': nodify(document.getElementById('productTitle')).innerText.trim(),
@@ -768,7 +784,7 @@ var discordStandard = false;
 		return o;
 	};
 	
-	function getWikipediaObject(settings, globalSettings) {
+	function getWikipediaObject(settings, globalSettings, isDiscord) {
 		var el;
 		
 		var wikititle = '';
