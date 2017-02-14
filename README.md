@@ -2,6 +2,8 @@
 
 Create a new bookmark and paste the given javascript-link. Online versions always use the updated code from github. Offline versions work with [NoScript](https://addons.mozilla.org/en-US/firefox/addon/noscript/), since those work without adding `<script>`-elements to the site.
 
+Does not work on Github and Twitter ([see here](https://medium.com/making-instapaper/bookmarklets-are-dead-d470d4bbb626)).
+
 ## Copy Bookmarklet
 
 Copy document title or post infos along with link to share with friends.
