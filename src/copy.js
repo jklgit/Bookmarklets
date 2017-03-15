@@ -49,7 +49,7 @@ var copyBookmarkletSettings = {
 						content: '%link%'
 					}, {
 						name: 'Copy movie info',
-						content: '> %movietitle%\n> %duration% | %genre%%ratingtag%%myratingtag%\n%summaryline%%link%\n',
+						content: '> %movietitle%\n> %duration% | %genre%%ratingtag%%myratingtag%\n%summaryline%%imdblink%\n',
 						settings: {
 							'Include summary': true
 						}
@@ -706,7 +706,8 @@ var copyBookmarkletSettings = {
 			'ratingtag': ' [ ' + star + ' ' + overview.find('[itemprop="ratingValue"]').eq(0).text().trim() + ' ]',
 			'myratingtag': myratingtext,
 			'genre': genretext,
-			'summaryline': summaryline
+			'imdblink' : document.location.href,
+			'summaryline': summaryline,
 		};
 		return o
 	};
