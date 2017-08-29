@@ -1,7 +1,7 @@
 // Global Settings for the copy bookmarklet
 var copyBookmarkletSettings = {
-	discordStandard : false,
-	watchingSankakuUsers : [],
+	discordStandard: false,
+	watchingSankakuUsers: [],
 };
 
 (function () {
@@ -200,7 +200,7 @@ var copyBookmarkletSettings = {
 						for (var key in site.buttons[i].settings) {
 							value = site.buttons[i].settings[key];
 
-							style = 'all:initial;color:#222;font-family:Arial;font-size:13px;margin:0 10px';
+							style = 'all:initial;color:#222;font-family:Arial;font-size:13px;margin:0 10px;-moz-appearance: checkbox;-webkit-appearance: checkbox;';
 							var label = document.createElement('label');
 							label.setAttribute('style', style);
 							divCheckboxes.appendChild(label);
@@ -248,7 +248,7 @@ var copyBookmarkletSettings = {
 					label.setAttribute('style', style);
 					divCheckboxes.appendChild(label);
 
-					style = 'all:initial;-webkit-appearance: checkbox;';
+					style = 'all:initial;-webkit-appearance: checkbox;-moz-appearance: checkbox;-webkit-appearance: checkbox;';
 					var input = document.createElement('input');
 					input.setAttribute('type', 'checkbox');
 					input.setAttribute('style', style);
@@ -283,12 +283,12 @@ var copyBookmarkletSettings = {
 			for (var i = 0; i < buttons.length; i++) {
 				buttons[i].addEventListener("click", function (event) {
 					event.preventDefault(); // Do not scroll to top
-					
+
 					var isDiscord = false;
-					if(copyBookmarkletSettings.discordStandard){
+					if (copyBookmarkletSettings.discordStandard) {
 						isDiscord = true;
 					};
-					
+
 					// Copy the text for button
 					var text = getText(event.target.getAttribute('my_id'), isDiscord);
 					if (copyBookmarkletSettings.discordStandard) {
@@ -302,12 +302,12 @@ var copyBookmarkletSettings = {
 
 				buttonsDiscord[i].addEventListener("click", function (event) {
 					event.preventDefault(); // Do not scroll to top
-					
+
 					var isDiscord = true;
-					if(copyBookmarkletSettings.discordStandard){
+					if (copyBookmarkletSettings.discordStandard) {
 						isDiscord = false;
 					};
-					
+
 					// Copy the text for button
 					var text = getText(event.target.getAttribute('my_id'), isDiscord);
 					if (!copyBookmarkletSettings.discordStandard) {
@@ -332,7 +332,7 @@ var copyBookmarkletSettings = {
 
 			// Prepare text for discord
 			function discordify(text) {
-				
+
 				// Replace block quotes
 				text = text.split('`\n').join('`');
 				text = text.split('`').join('```');
@@ -427,7 +427,7 @@ var copyBookmarkletSettings = {
 					title = title.substr(0, 197) + '...';
 				};
 				var link = document.location.href;
-				if (isDiscord){
+				if (isDiscord) {
 					link = '<' + link + '>';
 				};
 				var defaultObject = {
@@ -462,6 +462,102 @@ var copyBookmarkletSettings = {
 		}
 		return nodes;
 	};
+	
+	// Parse URL
+	function parseUrl(link) {
+
+		if (link === undefined) {
+			link = document.location.href;
+		}
+
+		var url = {};
+		url.href = link;
+
+		// Split link into link and hash part
+		var n = link.indexOf('#');
+		if (n > -1) {
+			url.hash = link.substr(n + 1);
+			url.hrefNoHash = link.substr(0, n);
+			link = url.hrefNoHash;
+		} else {
+			url.hash = '';
+			url.hrefNoHash = link;
+		}
+
+		// Split link into link and search part
+		n = link.indexOf('?');
+		if (n > -1) {
+			url.search = link.substr(n + 1);
+			url.hrefNoSearch = link.substr(0, n);
+		} else {
+			url.search = '';
+			url.hrefNoSearch = link;
+		}
+
+		// Get all parts of the link
+		// Regexp coarse: ((protocol://host:port)|file://)(path)(name.ext)
+		var regexp = /^((([^\/\.]+):\/\/)?(([^\/\.]+\.)*[^\/\.]+\.[^\/\.:]+(:\d+)?)|(file):\/\/)(\/.+\/|\/)?([^\/]+)?$/;
+		var tokens = regexp.exec(url.hrefNoSearch);
+		// url.regexp = regexp; // Save to check
+		// url.tokens = tokens;
+		/* Tokens:
+		 * 0: match
+		 * 1: link without /path/name.ext, if file, then file://
+		 * 2: https:// or ftp:// or undefined if not given
+		 * 3: http, https or ftp, if 2 http or https,e else undefined
+		 * 4: hostname + subdomain if 2 http, https or undefined
+		 * 5: undefined
+		 * 6: port
+		 * 7: file, if 2 file://
+		 * 8: /path/
+		 * 9: name.ext
+		 */
+		if (tokens) {
+			// If not a file, then get hostname
+			if (tokens[1] !== 'file://') {
+				url.protocol = tokens[3];
+				url.hostname = tokens[4];
+				url.port = (tokens[6]) ? tokens[6].substr(1) : undefined;
+				url.host = (url.port) ? url.hostname + ':' + url.port : url.hostname;
+				url.path = tokens[8];
+			} else {
+				url.protocol = 'file';
+				url.hostname = 'localhost';
+				url.path = tokens[8].substr(1);
+			}
+			url.file = tokens[9];
+			url.pathname = (url.file) ? url.path + url.file : url.path;
+		}
+
+		// Parse filename
+		if (url.file) {
+			n = url.file.lastIndexOf('.');
+			if (n > -1) {
+				url.name = url.file.substr(0, n);
+				url.ext = url.file.substr(n + 1);
+			} else {
+				url.name = url.file;
+				url.ext = '';
+			}
+		}
+
+		// Parse arguments
+		url.args = {};
+		if (url.search !== '') {
+			var array = url.search.split('&');
+			for (var i = 0; i < array.length; i++) {
+				n = array[i].indexOf('=');
+				if (n > -1) {
+					url.args[decodeURIComponent(array[i].substr(0, n))] =
+						decodeURIComponent(array[i].substr(n + 1));
+				} else {
+					url.args[decodeURIComponent(array[i])] = undefined;
+				}
+			}
+		}
+
+		return url;
+	}
 
 	// Additional functions for sites
 	function getSankakucomplexObject(settings, globalSettings, isDiscord) {
@@ -583,12 +679,12 @@ var copyBookmarkletSettings = {
 		// Icons
 		var star = decodeURI('%E2%98%86');
 		var heart = decodeURI('%E2%99%A1');
-		
+
 		// If Discord, add preview
 		var previewlink = '';
-		if(isDiscord){
+		if (isDiscord) {
 			var src = jQuery('#image').attr('src');
-			if(src){
+			if (src) {
 				previewlink = ' https:' + src;
 			};
 		};
@@ -612,11 +708,12 @@ var copyBookmarkletSettings = {
 
 	function getYoutubeObject(settings, globalSettings, isDiscord) {
 		// Parse info
-		var title = document.getElementById('eow-title').innerText;
-		var uploader = document.getElementsByClassName('yt-user-info')[0].innerText;
-		var views = document.getElementsByClassName('watch-view-count')[0].innerText.split(' ')[0];
-		var likes = parseInt(document.getElementsByClassName('like-button-renderer-like-button')[0].innerText.replace(/\D/g, ''));
-		var dislikes = parseInt(document.getElementsByClassName('like-button-renderer-dislike-button')[0].innerText.replace(/\D/g, ''));
+		var title = document.getElementsByClassName('title style-scope ytd-video-primary-info-renderer')[0].innerText;
+		var uploader = document.getElementById('owner-name').innerText;
+		var views = document.querySelector("yt-view-count-renderer").innerText.split(' ')[0];
+		var buttons = document.querySelectorAll('#top-level-buttons > ytd-toggle-button-renderer');
+		var likes = parseInt(buttons[0].innerText.replace(/\D/g, ''));
+		var dislikes = parseInt(buttons[1].innerText.replace(/\D/g, ''));
 		var duration = document.getElementsByClassName('ytp-time-duration')[0].innerText;
 
 		var viewsmin = parseInt(views.replace(/\D/g, ''));
@@ -639,7 +736,7 @@ var copyBookmarkletSettings = {
 
 		var link = document.location.href;
 		if (globalSettings['Clean link']) {
-			link = 'https://youtube.com/watch?v=' + yt.config_.VIDEO_ID;
+			link = 'https://youtube.com/watch?v=' + parseUrl().args.v;
 		};
 		var currenttime = '';
 		if (globalSettings['Include current time']) {
@@ -661,7 +758,7 @@ var copyBookmarkletSettings = {
 		var thumbdown = decodeURI('%E2%96%BC');
 		var play = decodeURI('%E2%96%BA');
 
-		return {
+		var obj =  {
 			'youtubetitle': title,
 			'youtubelink': link,
 			'play': play,
@@ -676,6 +773,8 @@ var copyBookmarkletSettings = {
 			'uploader': uploader,
 			'duration': duration,
 		};
+		
+		return obj;
 	};
 
 	function getImdbObject(settings, globalSettings, isDiscord) {
@@ -706,7 +805,7 @@ var copyBookmarkletSettings = {
 			'ratingtag': ' [ ' + star + ' ' + overview.find('[itemprop="ratingValue"]').eq(0).text().trim() + ' ]',
 			'myratingtag': myratingtext,
 			'genre': genretext,
-			'imdblink' : document.location.href,
+			'imdblink': document.location.href,
 			'summaryline': summaryline,
 		};
 		return o
@@ -763,7 +862,7 @@ var copyBookmarkletSettings = {
 		if (globalSettings['Clean link']) {
 			amazonlink = amazonlink.split('ref=')[0];
 		};
-		if(isDiscord){
+		if (isDiscord) {
 			amazonlink = '<' + amazonlink + '>';
 		};
 
@@ -776,30 +875,29 @@ var copyBookmarkletSettings = {
 		};
 		return o;
 	};
-	
+
 	function getWikipediaObject(settings, globalSettings, isDiscord) {
 		var el;
-		
+
 		var wikititle = '';
 		el = document.getElementById('firstHeading');
-		if(el !== null){
+		if (el !== null) {
 			wikititle = el.innerText;
-		}
-		else{
+		} else {
 			wikititle = document.title;
 		}
-		
+
 		var firstsentence = '';
 		el = document.querySelector('#mw-content-text > p');
-		if(el === null){ // if el not found
+		if (el === null) { // if el not found
 			el = document.querySelector('#bodyContent p');
 		};
-		if(el){
+		if (el) {
 			firstsentence = '> ' + el.innerText.split('. ')[0] + '.\n';
 		};
-				
+
 		return {
-			'wikititle' : wikititle,
+			'wikititle': wikititle,
 			'firstsentence': firstsentence,
 		};
 	};
