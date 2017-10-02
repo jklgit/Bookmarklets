@@ -1,5 +1,3 @@
-(function () {
-
 	// Fullwidth converter
 	String.prototype.toFullWidth = function () {
 		return this.replace(/[A-Za-z0-9]/g, function (s) {
@@ -439,5 +437,3 @@
 	// Apply on head and body
 	applyWalker(document.head);
 	applyWalker(document.body);
-
-})();
