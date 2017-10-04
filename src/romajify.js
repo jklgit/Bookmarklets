@@ -424,14 +424,16 @@ function applyWalker(node) {
 	if (!node) {
 		node = document.body;
 	};
-	
+
 	// Create Treewalker to walk through every text node
 	var walk = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
 
 	// Change every hiragana and katakana to romaji
 	var n;
 	while (n = walk.nextNode()) {
-		n.nodeValue = romaji.fromKana(n.nodeValue);
+		if(n.parentNode.tagName !== 'SCRIPT'){
+			n.nodeValue = romaji.fromKana(n.nodeValue);
+		}
 	}
 };
 
