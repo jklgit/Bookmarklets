@@ -409,7 +409,7 @@ String.prototype.toFullWidth = function () {
 		};
 
 		//replace long vowels
-		result = result.replace(/([﻿ａｅｉｏｕ])ー/gu, "$1");
+		result = result.replace(/([﻿ａｅｉｏｕ])ー/gu, "$1u");
 
 		//replace the sokuon (doubling)
 		result = result.replace(/(ッ|っ)([﻿ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ])/gu, "$2$2");
