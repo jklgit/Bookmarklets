@@ -19,10 +19,3 @@ Copy document title or post infos along with link to share with friends.
 Find video files in the current document.
 
 [Javascript link](https://raw.githubusercontent.com/jklgit/Bookmarklets/master/src/vidfinder_offline.js)
-
-
-## Romajify
-
-Convert Hiragana and Katana symbols to Romaji in the current document.
-
-[Javascript link](https://raw.githubusercontent.com/jklgit/Bookmarklets/master/src/romajify_offline.js)
