@@ -19,3 +19,9 @@ Copy document title or post infos along with link to share with friends.
 Find video files in the current document.
 
 [Javascript link](https://raw.githubusercontent.com/jklgit/Bookmarklets/master/src/vidfinder_offline.js)
+
+## Make any table sortable
+
+Makes any table sortable by adding sorting arrows to the table header. Works only for tables with `thead` and `tbody`.
+
+[Javascript link](https://raw.githubusercontent.com/jklgit/Bookmarklets/master/src/sorttable_offline.js)
