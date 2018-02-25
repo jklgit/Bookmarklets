@@ -11,12 +11,13 @@
 	});
 
 	const sortTable = (table, column, order = 1) => {
-		let nodes = [...table.querySelectorAll('tbody > tr')].sort((a, b) => {
+		let tbody = table.querySelector('tbody');
+		let nodes = [...tbody.querySelectorAll('tr')].sort((a, b) => {
 			a = a.querySelector(`td:nth-child(${column+1})`).innerText;
 			b = b.querySelector(`td:nth-child(${column+1})`).innerText;
 			return (order * compare(a, b));
 		});
-		nodes.forEach((node) => table.querySelector('tbody').appendChild(node));
+		nodes.forEach((node) => tbody.appendChild(node));
 
 		return table;
 	};
